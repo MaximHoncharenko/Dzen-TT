@@ -1,8 +1,7 @@
 # Вибираємо Python-образ
-FROM python:3.11-slim-bookworm
+FROM python:3.11.8-slim-bookworm
 
-# Update system packages to reduce vulnerabilities
-RUN apt-get update && apt-get upgrade -y && apt-get clean
+RUN apt-get update && apt-get upgrade -y && apt-get dist-upgrade -y && apt-get autoremove -y && apt-get clean
 
 # Оточення
 ENV PYTHONDONTWRITEBYTECODE=1
