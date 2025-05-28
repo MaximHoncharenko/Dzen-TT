@@ -8,3 +8,10 @@ django-simple-captcha
 django-cors-headers
 psycopg2-binary
 gunicorn
+django-storages
+boto3
+django-filter
+django-extensions
+django-debug-toolbar
+django-redis
+drf-yasg
