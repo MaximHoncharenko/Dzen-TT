@@ -1,4 +1,5 @@
 import re
+import requests
 from rest_framework import serializers
 from .models import UserInfo, Comment, Attachment
 import bleach
@@ -73,8 +74,18 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'text', 'created_at', 'parent_id', 'attachments', 'replies', 'captcha']
 
     def validate_captcha(self, value):
-        # Заглушка: перевіряємо, що капча рівна "abcd"
-        if not value or value.lower() != 'abcd':
+        secret_key = '6LcLxkwrAAAAADIJHHYmzF1DsfN210q6QeQ1F9oP'
+
+        response = requests.post(
+            'https://www.google.com/recaptcha/api/siteverify',
+            data={
+                'secret': secret_key,
+                'response': value
+            }
+        )
+        result = response.json()
+
+        if not result.get('success'):
             raise serializers.ValidationError('Невірна CAPTCHA.')
         return value
 

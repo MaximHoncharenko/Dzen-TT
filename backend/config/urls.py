@@ -5,6 +5,7 @@ from django.utils.html import format_html
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
+from comments import views  # Import the views module from the comments app
 
 def index(request):
     html = format_html("""
@@ -43,10 +44,16 @@ def index(request):
                 <a href="/swagger/" class="btn">Swagger UI</a>
                 <a href="/redoc/" class="btn">Redoc</a>
                 <a href="/api/docs/" class="btn">Swagger UI (Alt)</a>
+
+                <h2>Сторінка з коментарями</h2>
+                <a href="/api/comments/page/" class="btn">Сторінка коментарів</a>
             </body>
         </html>
     """)
     return HttpResponse(html)
+
+
+
 
     
 
@@ -70,4 +77,7 @@ urlpatterns = [
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('', index),  # головна сторінка
+    path('comments/', include('comments.urls')),  # URL для коментарів
+    path('page/', views.comments_page, name='comments-page'),
+
 ]

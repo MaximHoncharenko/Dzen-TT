@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8" />
+    <title>Коментарі</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .comment { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+        .reply { margin-left: 30px; }
+        .author { font-weight: bold; }
+        textarea { width: 100%; height: 60px; }
+        button { margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+<h1>Коментарі</h1>
+
+<div id="comments-container"></div>
+
+<h2>Додати новий коментар</h2>
+<textarea id="new-comment-text" placeholder="Ваш коментар..."></textarea><br/>
+<button onclick="addComment()">Відправити</button>
+
+<script>
+    async function fetchComments() {
+        const res = await fetch('/api/comments/list/');
+        const comments = await res.json();
+        const container = document.getElementById('comments-container');
+        container.innerHTML = '';
+        comments.forEach(comment => {
+            container.appendChild(renderComment(comment));
+        });
+    }
+
+    function renderComment(comment, isReply = false) {
+        const div = document.createElement('div');
+        div.className = 'comment' + (isReply ? ' reply' : '');
+        div.dataset.id = comment.id;
+
+        const author = document.createElement('div');
+        author.className = 'author';
+        author.textContent = comment.author;
+        div.appendChild(author);
+
+        const text = document.createElement('div');
+        text.textContent = comment.text;
+        div.appendChild(text);
+
+        // Кнопка для відповіді
+        const replyBtn = document.createElement('button');
+        replyBtn.textContent = 'Відповісти';
+        replyBtn.onclick = () => {
+            if (div.querySelector('textarea')) return; // вже є поле відповіді
+            const textarea = document.createElement('textarea');
+            textarea.placeholder = 'Ваша відповідь...';
+            const sendBtn = document.createElement('button');
+            sendBtn.textContent = 'Відправити відповідь';
+            sendBtn.onclick = () => addReply(comment.id, textarea.value);
+            div.appendChild(textarea);
+            div.appendChild(sendBtn);
+        }
+        div.appendChild(replyBtn);
+
+        // Рендеримо відповіді, якщо є
+        if (comment.replies && comment.replies.length > 0) {
+            comment.replies.forEach(reply => {
+                div.appendChild(renderComment(reply, true));
+            });
+        }
+
+        return div;
+    }
+
+    async function addComment() {
+        const text = document.getElementById('new-comment-text').value.trim();
+        if (!text) {
+            alert('Напишіть коментар!');
+            return;
+        }
+        await sendComment(text, null);
+        document.getElementById('new-comment-text').value = '';
+        fetchComments();
+    }
+
+    async function addReply(parentId, text) {
+        if (!text.trim()) {
+            alert('Напишіть відповідь!');
+            return;
+        }
+        await sendComment(text, parentId);
+        fetchComments();
+    }
+
+    async function sendComment(text, parentId) {
+        const res = await fetch('/api/comments/add/', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({text: text, parent_id: parentId})
+        });
+        if (!res.ok) {
+            alert('Помилка при відправці коментаря');
+        }
+    }
+
+    fetchComments();
+</script>
+
+</body>
+</html>

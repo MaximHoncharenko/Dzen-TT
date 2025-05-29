@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
-from PIL import Image
+from PIL import Image, ImageResampling
 import bleach
 import os
 
@@ -60,28 +60,38 @@ class Attachment(models.Model):
     file = models.FileField(upload_to='attachments/', validators=[validate_file_extension])
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
-    def clean(self):
-        super().clean()
-        if self.file.size > 100 * 1024:  # 100 KB
-            ext = os.path.splitext(self.file.name)[1].lower()
-            if ext == '.txt':
-                raise ValidationError("Text files must be less than 100 KB.")
-        
+    def save(self, *args, **kwargs):
         ext = os.path.splitext(self.file.name)[1].lower()
+
+        # Обмеження розміру .txt файлу
+        if ext == '.txt' and self.file.size > 100 * 1024:
+            raise ValidationError("Text files must be less than 100 KB.")
+
+        # Обробка зображень
         if ext in ['.jpg', '.jpeg', '.gif', '.png']:
             try:
                 img = Image.open(self.file)
                 max_width, max_height = 320, 240
                 if img.width > max_width or img.height > max_height:
-                    img.thumbnail((max_width, max_height), Image.ANTIALIAS)
+                    img.thumbnail((max_width, max_height), Image.Resampling.LANCZOS)
+
                     from io import BytesIO
                     from django.core.files.base import ContentFile
-                    
+
                     buffer = BytesIO()
-                    img.save(buffer, format=img.format)
-                    self.file.save(self.file.name, ContentFile(buffer.getvalue()), save=False)
-            except Exception as e:
+                    img_format = img.format if img.format else 'JPEG'
+                    img.save(buffer, format=img_format)
+                    buffer.seek(0)
+
+                    new_file = ContentFile(buffer.read())
+                    new_name = os.path.splitext(self.file.name)[0] + '.' + img_format.lower()
+                    self.file.save(new_name, new_file, save=False)
+            except Exception:
                 raise ValidationError("Invalid image file.")
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f'File for Comment {self.comment.id}'
+
+
