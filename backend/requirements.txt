@@ -47,3 +47,6 @@ celery[redis]==5.3.4
 
 # Image processing
 opencv-python-headless==4.10.0.84
+
+djangorestframework-simplejwt==5.2.2
+# Optional: For handling large files   
