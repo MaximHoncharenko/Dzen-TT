@@ -1,21 +1,21 @@
-# Вибираємо Python-образ
 FROM python:3.11.8-slim-bookworm
 
-RUN apt-get update && apt-get upgrade -y && apt-get dist-upgrade -y && apt-get autoremove -y && apt-get clean
-
-# Оточення
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+# Встановлюємо netcat і build tools
+RUN apt-get update && apt-get install -y netcat-openbsd build-essential && apt-get clean
 
 # Робоча директорія
 WORKDIR /backend
 
-# Копіюємо requirements та встановлюємо залежності
+# Встановлення залежностей
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Копіюємо решту коду
+# Копіюємо проєкт
 COPY . .
 
+# Копіюємо скрипт очікування БД
+COPY wait-for-db.sh /wait-for-db.sh
+RUN chmod +x /wait-for-db.sh
+
 # Команда запуску
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["/wait-for-db.sh", "python", "manage.py", "runserver", "0.0.0.0:8000"]

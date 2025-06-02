@@ -5,6 +5,8 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from comments.views import index
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 schema_view = get_schema_view(
@@ -30,4 +32,4 @@ urlpatterns = [
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 
     path('', index),  # головна сторінка з HTML+JS
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
