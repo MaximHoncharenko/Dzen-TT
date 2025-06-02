@@ -1,13 +1,3 @@
-<template>
-  <div class="comment-form">
-    <h3>Додати новий коментар</h3>
-    <textarea v-model="text" placeholder="Ваш коментар..." />
-    <input v-model="captcha" placeholder="Введіть CAPTCHA (abcd)" />
-    <button @click="submitComment">Надіслати</button>
-    <p v-if="error" class="error">{{ error }}</p>
-  </div>
-</template>
-
 <script>
 export default {
   name: 'CommentForm',
@@ -26,11 +16,14 @@ export default {
         return;
       }
 
+      const token = localStorage.getItem('access'); // ⬅️ Витягуємо токен
+
       try {
         const response = await fetch('http://localhost:8000/api/comments/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`, // ⬅️ Додаємо токен у заголовок
           },
           body: JSON.stringify({
             text: this.text,
@@ -54,21 +47,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.comment-form {
-  margin-top: 2rem;
-}
-textarea {
-  width: 100%;
-  height: 80px;
-  margin-bottom: 8px;
-}
-input {
-  width: 100%;
-  margin-bottom: 8px;
-}
-.error {
-  color: red;
-}
-</style>

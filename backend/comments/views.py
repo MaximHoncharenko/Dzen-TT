@@ -3,6 +3,10 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from .models import Comment
 from .serializers import CommentSerializer
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
 
 class CommentPagination(PageNumberPagination):
     page_size = 25
@@ -84,6 +88,25 @@ class ReplyCreateAPIView(generics.CreateAPIView):
         else:
             serializer.save(parent=parent_comment)
 
+class RegisterAPIView(APIView):
+    def post(self, request):
+        username = request.data.get('username')
+        email = request.data.get('email', '')
+        password = request.data.get('password')
+
+        if not username or not password:
+            return Response({'error': 'Потрібні username та password'}, status=400)
+
+        if User.objects.filter(username=username).exists():
+            return Response({'error': 'Користувач з таким імʼям вже існує'}, status=400)
+
+        try:
+            validate_password(password)
+        except ValidationError as e:
+            return Response({'error': e.messages}, status=400)
+
+        user = User.objects.create_user(username=username, email=email, password=password)
+        return Response({'message': 'Користувач створений'}, status=201)
 
 # -------------------------------
 # HTML-сторінка з вбудованим JS

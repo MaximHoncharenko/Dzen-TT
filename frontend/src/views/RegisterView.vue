@@ -1,53 +1,52 @@
 <template>
-  <div class="login-container">
-    <h1>Авторизація</h1>
-    <form @submit.prevent="login">
+  <div class="register-container">
+    <h1>Реєстрація</h1>
+    <form @submit.prevent="register">
       <label>Ім'я користувача:</label>
       <input v-model="username" type="text" required />
+      <label>Email:</label>
+      <input v-model="email" type="email" />
       <label>Пароль:</label>
       <input v-model="password" type="password" required />
-      <button type="submit">Увійти</button>
+      <button type="submit">Зареєструватись</button>
       <p v-if="error" class="error">{{ error }}</p>
+      <p v-if="success" class="success">{{ success }}</p>
     </form>
-
-    <!-- 🔻 ДОДАЙ ЦЕ СЮДИ ПІД ФОРМОЮ -->
-    <p class="register-link">
-      Ще не маєш акаунту?
-      <router-link to="/register">Зареєструватись</router-link>
-    </p>
   </div>
-</template> 
+</template>
 
 <script>
 export default {
   data() {
     return {
       username: '',
+      email: '',
       password: '',
-      error: ''
+      error: '',
+      success: ''
     };
   },
   methods: {
-    async login() {
+    async register() {
       try {
-        const response = await fetch('http://localhost:8000/api/token/', {
+        const res = await fetch('http://localhost:8000/api/register/', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             username: this.username,
+            email: this.email,
             password: this.password
           })
         });
 
-        if (!response.ok) {
-          throw new Error('Невірний логін або пароль');
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Помилка реєстрації');
         }
 
-        const data = await response.json();
-        localStorage.setItem('access', data.access);
-        localStorage.setItem('refresh', data.refresh);
-
-        this.$router.push('/');
+        this.success = 'Успішна реєстрація! Перенаправлення...';
+        setTimeout(() => this.$router.push('/login'), 2000);
       } catch (err) {
         this.error = err.message;
       }
@@ -57,7 +56,7 @@ export default {
 </script>
 
 <style scoped>
-.login-container {
+.register-container {
   max-width: 400px;
   margin: auto;
   padding: 20px;
@@ -69,7 +68,7 @@ label, input {
 .error {
   color: red;
 }
-.register-link {
-  margin-top: 10px;
+.success {
+  color: green;
 }
 </style>
