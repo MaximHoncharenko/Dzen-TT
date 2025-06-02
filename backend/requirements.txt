@@ -1,17 +1,49 @@
-django
-djangorestframework
-psycopg2-binary
-python-dotenv
-Pillow
-bleach
-django-simple-captcha
-django-cors-headers
-psycopg2-binary
-gunicorn
-django-storages
-boto3
-django-filter
-django-extensions
-django-debug-toolbar
-django-redis
-drf-yasg
+# Core Django
+django==5.2.1
+djangorestframework==3.15.2
+
+# Database
+psycopg2-binary==2.9.9
+
+# Environment and security
+python-dotenv==1.0.1
+django-cors-headers==4.4.0
+
+# File handling
+Pillow==10.4.0
+bleach==6.1.0
+
+# Captcha
+django-simple-captcha==0.6.0
+
+# API and documentation
+django-filter==24.3
+drf-yasg==1.21.7
+
+# Caching
+django-redis==5.4.0
+
+# Production server
+gunicorn==22.0.0
+
+# Cloud storage (optional)
+django-storages==1.14.4
+boto3==1.34.162
+
+# Development tools
+django-extensions==3.2.3
+django-debug-toolbar==4.4.6
+
+# HTTP requests
+requests==2.32.3
+
+# WebSocket support
+channels==4.1.0
+channels-redis==4.2.0
+
+# Task queue (for file processing)
+celery==5.3.4
+celery[redis]==5.3.4
+
+# Image processing
+opencv-python-headless==4.10.0.84

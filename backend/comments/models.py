@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
-from PIL import Image, ImageResampling
+from PIL import Image
 import bleach
 import os
 

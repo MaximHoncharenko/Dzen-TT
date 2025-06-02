@@ -1,16 +1,19 @@
 <template>
   <div id="app">
-    <Comments />
+    <router-view />
   </div>
 </template>
 
 <script>
-import Comments from './components/Comments.vue'
-
 export default {
   name: 'App',
-  components: {
-    Comments
-  }
-}
+};
 </script>
+
+<style>
+#app {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+</style>
