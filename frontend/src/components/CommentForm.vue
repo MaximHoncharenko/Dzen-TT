@@ -10,7 +10,19 @@
       <input v-model="homepage" placeholder="Home page (необовʼязково)" type="url" />
     </div>
 
-    <textarea v-model="text" placeholder="Ваш коментар..." />
+    <!-- Панель тегов -->
+    <div class="tag-panel">
+      <button type="button" @click="insertTag('i')"><i>i</i></button>
+      <button type="button" @click="insertTag('strong')"><strong>strong</strong></button>
+      <button type="button" @click="insertTag('code')"><code>code</code></button>
+      <button type="button" @click="insertLink">a</button>
+    </div>
+    <!-- Поле ввода -->
+    <textarea
+      v-model="text"
+      ref="textarea"
+      placeholder="Ваш коментар..."
+    />
     <CaptchaImage ref="captchaImg" />
     <input v-model="captcha" placeholder="Введіть CAPTCHA" />
     <input type="file" @change="handleFile" accept=".jpg,.jpeg,.png,.gif,.txt" />
@@ -20,6 +32,18 @@
     </div>
     <button @click="submitComment">Надіслати</button>
     <p v-if="error" class="error">{{ error }}</p>
+
+    <button type="button" @click="showPreview = !showPreview" style="margin-bottom:8px;">
+      {{ showPreview ? 'Сховати перегляд' : 'Переглянути' }}
+    </button>
+    <div v-if="showPreview" class="preview-block">
+      <h4>Попередній перегляд:</h4>
+      <div v-html="renderedPreview" class="preview-content"></div>
+      <div v-if="file" style="margin-top:8px;">
+        <img v-if="isImage(file.name)" :src="fileUrl" style="max-width:120px;max-height:90px;" />
+        <span v-else>TXT: {{ file.name }}</span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -45,12 +69,40 @@ export default {
       email: '',
       homepage: '',
       file: null,
+      showPreview: false,
+      fileUrl: null,
     };
+  },
+  watch: {
+    file(newFile) {
+      if (newFile && this.isImage(newFile.name)) {
+        this.fileUrl = URL.createObjectURL(newFile);
+      } else {
+        this.fileUrl = null;
+      }
+    }
   },
   computed: {
     isAuthenticated() {
       return !!localStorage.getItem('access');
     },
+    renderedPreview() {
+      // Оставляем только разрешённые теги и атрибуты
+      const allowedTags = ['i', 'strong', 'code', 'a'];
+      const allowedAttrs = { a: ['href', 'title'] };
+      // Используем bleach или простую замену (если bleach не доступен на фронте)
+      // Здесь пример простой фильтрации:
+      let html = this.text
+        .replace(/</g, '&lt;')
+        .replace(/&lt;(\/?(i|strong|code|a)( [^&<>]*)?)&gt;/gi, '<$1>');
+      // Очищаем атрибуты у <a>
+      html = html.replace(/<a([^>]*)>/gi, (match, attrs) => {
+        const href = (attrs.match(/href="([^"]*)"/) || [])[1] || '';
+        const title = (attrs.match(/title="([^"]*)"/) || [])[1] || '';
+        return `<a href="${href}" title="${title}">`;
+      });
+      return html;
+    }
   },
   mounted() {
     // Если пользователь авторизован, можно подставить email/username из профиля (если нужно)
@@ -116,12 +168,61 @@ export default {
         this.email = '';
         this.homepage = '';
         this.file = null;
+        this.showPreview = false;
         this.$refs.captchaImg.refreshCaptcha();
         this.$emit('comment-added');
       } catch (e) {
         this.error = e.message || 'Помилка при зʼєднанні з API';
         this.$refs.captchaImg.refreshCaptcha();
       }
+    },
+    insertTag(tag) {
+      // Добавить тег в конце, с новой строки
+      const tagText = `<${tag}></${tag}>`;
+      if (this.text && !this.text.endsWith('\n')) {
+        this.text += '\n';
+      }
+      this.text += tagText;
+      this.$nextTick(() => {
+        this.$refs.textarea.focus();
+      });
+    },
+    insertLink() {
+      const url = prompt('Введіть URL:', 'https://');
+      if (url) {
+        const linkText = `<a href="${url}" title="">текст</a>`;
+        if (this.text && !this.text.endsWith('\n')) {
+          this.text += '\n';
+        }
+        this.text += linkText;
+        this.$nextTick(() => {
+          this.$refs.textarea.focus();
+        });
+      }
+    },
+    validateTags(text) {
+      // Разрешённые теги
+      const allowed = ['i', 'strong', 'code', 'a'];
+      // Найти все открывающие и закрывающие теги
+      const tags = [...text.matchAll(/<\/?([a-z]+)[^>]*>/gi)].map(m => m[1].toLowerCase());
+      // Проверить, что все теги разрешённые
+      for (const tag of tags) {
+        if (!allowed.includes(tag)) {
+          return `Дозволені лише теги: <i>, <strong>, <code>, <a>`;
+        }
+      }
+      // Проверить парность тегов (упрощённо)
+      for (const tag of allowed) {
+        const open = (text.match(new RegExp(`<${tag}[^>]*>`, 'gi')) || []).length;
+        const close = (text.match(new RegExp(`</${tag}>`, 'gi')) || []).length;
+        if (open !== close) {
+          return `Тег <${tag}> не закритий або закритий некоректно`;
+        }
+      }
+      return null;
+    },
+    isImage(name) {
+      return /\.(jpg|jpeg|png|gif)$/i.test(name);
     },
   },
 };
@@ -142,5 +243,34 @@ input {
 }
 .error {
   color: red;
+}
+.tag-panel {
+  margin-bottom: 8px;
+}
+.tag-panel button {
+  background: #232324;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 4px;
+  margin-right: 4px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background 0.2s;
+}
+.tag-panel button:hover {
+  background: #333;
+}
+.preview-block {
+  background: #232324;
+  color: #fff;
+  border: 1px solid #444;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
+.preview-content {
+  white-space: pre-wrap;
+  font-size: 1em;
 }
 </style>

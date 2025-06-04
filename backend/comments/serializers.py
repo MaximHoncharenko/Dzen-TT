@@ -1,8 +1,11 @@
 import requests
 import bleach
+import re
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Comment, Attachment
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 ALLOWED_TAGS = ['a', 'code', 'i', 'strong']
 ALLOWED_ATTRIBUTES = {'a': ['href', 'title']}
@@ -47,7 +50,19 @@ class CommentSerializer(serializers.ModelSerializer):
         return value
 
     def validate_text(self, value):
-        return bleach.clean(value, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES, strip=True)
+        allowed = ['i', 'strong', 'code', 'a']
+        # Найти все открывающие и закрывающие теги
+        tags = [m.group(1).lower() for m in re.finditer(r'</?([a-z]+)[^>]*>', value)]
+        for tag in tags:
+            if tag not in allowed:
+                raise serializers.ValidationError('Дозволені лише теги: <i>, <strong>, <code>, <a>')
+        # Проверить парность тегов (упрощённо)
+        for tag in allowed:
+            open_count = len(re.findall(rf'<{tag}[^>]*>', value, re.IGNORECASE))
+            close_count = len(re.findall(rf'</{tag}>', value, re.IGNORECASE))
+            if open_count != close_count:
+                raise serializers.ValidationError(f'Тег <{tag}> не закритий або закритий некоректно')
+        return value
 
     def validate(self, data):
         user = self.context['request'].user
@@ -55,7 +70,6 @@ class CommentSerializer(serializers.ModelSerializer):
             # Аноним: username и email обязательны
             if not data.get('username') or not data.get('email'):
                 raise serializers.ValidationError("User Name и Email обовʼязкові для анонімних коментарів.")
-            import re
             if not re.match(r'^[A-Za-z0-9]+$', data['username']):
                 raise serializers.ValidationError("User Name: тільки латиниця і цифри.")
         return data
@@ -67,4 +81,12 @@ class CommentSerializer(serializers.ModelSerializer):
         comment = Comment.objects.create(**validated_data)
         if file:
             Attachment.objects.create(comment=comment, file=file)
+        # Отправить обновление в WebSocket
+        from .serializers import CommentSerializer
+        channel_layer = get_channel_layer()
+        data = CommentSerializer(comment, context={'request': request}).data
+        async_to_sync(channel_layer.group_send)(
+            "comments",
+            {"type": "comment_update", "data": data}
+        )
         return comment
