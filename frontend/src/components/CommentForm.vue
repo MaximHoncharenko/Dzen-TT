@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <template>
   <div class="comment-form">
     <h3 v-if="!parentId">Додати новий коментар</h3>
@@ -23,6 +24,8 @@
   </div>
 </template>
 
+=======
+>>>>>>> 87de69ce221dc6cf0d22ed8ea060621e465c5864
 <script>
 import { authFetch } from '../utils/authFetch';
 import CaptchaImage from './CaptchaImage.vue';
@@ -94,14 +97,21 @@ export default {
       if (this.parentId) formData.append('parent_id', this.parentId);
       if (this.file) formData.append('file', this.file);
 
+      const token = localStorage.getItem('access'); // ⬅️ Витягуємо токен
+
       try {
         const response = await fetch('http://localhost:8000/api/comments/', {
           method: 'POST',
           body: formData,
           credentials: 'include',
           headers: {
+<<<<<<< HEAD
             Authorization: localStorage.getItem('access') ? 'Bearer ' + localStorage.getItem('access') : undefined,
             // НЕ добавляйте Content-Type вручную!
+=======
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`, // ⬅️ Додаємо токен у заголовок
+>>>>>>> 87de69ce221dc6cf0d22ed8ea060621e465c5864
           },
         });
         if (!response.ok) {
@@ -127,21 +137,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.comment-form {
-  margin-top: 2rem;
-}
-textarea {
-  width: 100%;
-  height: 80px;
-  margin-bottom: 8px;
-}
-input {
-  width: 100%;
-  margin-bottom: 8px;
-}
-.error {
-  color: red;
-}
-</style>
