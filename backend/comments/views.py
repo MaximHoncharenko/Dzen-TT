@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
+<<<<<<< HEAD
 import random
 import string
 from io import BytesIO
@@ -14,6 +15,8 @@ from PIL import Image, ImageDraw, ImageFont
 from django.http import HttpResponse
 from django.views.decorators.http import require_GET
 
+=======
+>>>>>>> 87de69ce221dc6cf0d22ed8ea060621e465c5864
 
 class CommentPagination(PageNumberPagination):
     page_size = 25
