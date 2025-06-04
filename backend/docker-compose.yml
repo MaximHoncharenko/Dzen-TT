@@ -14,8 +14,7 @@ services:
       - app-network
 
   redis:
-    image: redis:7-alpine
-    restart: always
+    image: redis:7
     ports:
       - "6379:6379"
     networks:
@@ -23,7 +22,7 @@ services:
 
   web:
     build: .
-    command: ["/wait-for-db.sh", "python", "manage.py", "runserver", "0.0.0.0:8000"]
+    command: ["/wait-for-db.sh", "daphne", "-b", "0.0.0.0", "-p", "8000", "config.asgi:application"]
     volumes:
       - .:/backend
     ports:

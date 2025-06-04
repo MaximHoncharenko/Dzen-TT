@@ -97,7 +97,7 @@
 
 <script>
 import CommentForm from './CommentForm.vue';
-import { authFetch } from '../utils/authFetch'; // ДОДАНО ІМПОРТ
+import { authFetch } from '../utils/authFetch';
 
 export default {
   name: 'CommentList',
@@ -121,8 +121,9 @@ export default {
       return !!localStorage.getItem('access');
     },
   },
-  async mounted() {
-    await this.fetchComments();
+  mounted() {
+    this.fetchComments();
+    this.connectWebSocket();
   },
   methods: {
     async fetchComments() {
@@ -132,12 +133,23 @@ export default {
         ordering: this.ordering,
       });
       try {
-        const res = await fetch(`http://localhost:8000/api/comments/?${params}`, {
-          headers: {
-            Authorization: localStorage.getItem('access') ? 'Bearer ' + localStorage.getItem('access') : undefined,
-          },
+        const headers = {};
+        const token = localStorage.getItem('access');
+        if (token) {
+          headers.Authorization = 'Bearer ' + token;
+        }
+        const res = await authFetch(`http://localhost:8000/api/comments/?${params}`, {
+          headers,
           credentials: 'include'
         });
+        if (res.status === 401) {
+          // Токен невалиден — удаляем его
+          localStorage.removeItem('access');
+          // Можно также разлогинить пользователя, если нужно
+          // this.$emit('logout');
+          // Повторяем запрос без токена
+          return this.fetchComments();
+        }
         if (!res.ok) {
           this.comments = [];
           this.count = 0;
@@ -152,10 +164,7 @@ export default {
         this.next = data.next;
         this.previous = data.previous;
       } catch (e) {
-        this.comments = [];
-        this.count = 0;
-        this.next = null;
-        this.previous = null;
+        // обработка других ошибок
       }
       this.loading = false;
     },
@@ -200,6 +209,22 @@ export default {
       this.page = 1;
       this.fetchComments();
     },
+    connectWebSocket() {
+      const ws = new WebSocket('ws://localhost:8000/ws/comments/');
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        // Можно просто обновить список, либо добавить комментарий в начало
+        this.fetchComments();
+      };
+      ws.onclose = () => {
+        // Автоматически переподключаться при разрыве
+        setTimeout(this.connectWebSocket, 2000);
+      };
+      this.ws = ws;
+    },
+  },
+  beforeUnmount() {
+    if (this.ws) this.ws.close();
   },
 };
 </script>

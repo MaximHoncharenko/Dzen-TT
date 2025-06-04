@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'django_filters',
     'drf_yasg',
     'rest_framework_simplejwt',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -91,6 +92,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
+ASGI_APPLICATION = 'config.asgi.application'
 
 # Database
 DATABASES = {
@@ -99,7 +101,7 @@ DATABASES = {
         'NAME': os.getenv("POSTGRES_DB", "comments"),
         'USER': os.getenv("POSTGRES_USER", "admin"),
         'PASSWORD': os.getenv("POSTGRES_PASSWORD", "admin"),
-        'HOST': os.getenv("POSTGRES_HOST", "localhost"),
+        'HOST': os.getenv("POSTGRES_HOST", "db"),
         'PORT': os.getenv("POSTGRES_PORT", "5432"),
     }
 }
@@ -108,11 +110,20 @@ DATABASES = {
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/1'),
+        'LOCATION': os.getenv('REDIS_URL', 'redis://redis:6379/1'),
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
     }
+}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("redis", 6379)],
+        },
+    },
 }
 
 # Password validation
