@@ -34,6 +34,9 @@ INSTALLED_APPS = [
     'drf_yasg',
     'rest_framework_simplejwt',
     'channels',
+    'django_redis',
+    'django_extensions',  # для зручності розробки
+    
 ]
 
 MIDDLEWARE = [
