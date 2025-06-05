@@ -68,6 +68,16 @@
             </td>
             <td>
               <button @click="toggleReply(comment.id)">Відповісти</button>
+              <button
+                v-if="isAuthor(comment)"
+                @click="deleteComment(comment.id)"
+                style="margin-left:8px;background:#c0392b;border:none;color:#fff;border-radius:4px;padding:6px 14px;cursor:pointer;"
+              >
+                Видалити
+              </button>
+              <div style="font-size:12px;color:#aaa;">
+                user: {{ comment.user }} | current: {{ currentUser }}
+              </div>
               <div v-if="replyToId === comment.id">
                 <CommentForm :parentId="comment.id" @comment-added="handleReplySubmitted" />
               </div>
@@ -120,6 +130,9 @@ export default {
     isAuthenticated() {
       return !!localStorage.getItem('access');
     },
+    currentUser() {
+      return localStorage.getItem('username');
+    },
   },
   mounted() {
     this.fetchComments();
@@ -166,6 +179,7 @@ export default {
       } catch (e) {
         // обработка других ошибок
       }
+      console.log(this.comments);
       this.loading = false;
     },
     logout() {
@@ -221,6 +235,31 @@ export default {
         setTimeout(this.connectWebSocket, 2000);
       };
       this.ws = ws;
+    },
+    isAuthor(comment) {
+      const user = localStorage.getItem('username');
+      return user && (user === comment.user);
+    },
+    async deleteComment(commentId) {
+      if (!confirm('Удалить комментарий?')) return;
+      const token = localStorage.getItem('access');
+      try {
+        const res = await fetch(`http://localhost:8000/api/comments/${commentId}/`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (res.status === 204) {
+          this.comments = this.comments.filter(c => c.id !== commentId);
+        } else if (res.status === 403) {
+          alert('Нет прав на удаление этого комментария');
+        } else {
+          alert('Ошибка удаления');
+        }
+      } catch (e) {
+        alert('Ошибка сети');
+      }
     },
   },
   beforeUnmount() {

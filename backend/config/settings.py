@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'channels',
     'django_redis',
-    'django_extensions',  # для зручності розробки
+    'django_extensions',  
     
 ]
 
@@ -53,7 +53,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'config.urls'
 
 # CORS settings
-CORS_ALLOW_ALL_ORIGINS = True  # или настройте CORS_ALLOWED_ORIGINS
+CORS_ALLOW_ALL_ORIGINS = True  
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",

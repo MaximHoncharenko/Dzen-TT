@@ -46,6 +46,7 @@ export default {
         const data = await response.json();
         localStorage.setItem('access', data.access);
         localStorage.setItem('refresh', data.refresh);
+        localStorage.setItem('username', this.username); // <-- вот эта строка
 
         this.$router.push('/');
       } catch (err) {
