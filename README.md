@@ -135,6 +135,7 @@ docker-compose exec web python manage.py createsuperuser
 ## Видео-демонстрация
 
 Видео с демонстрацией работы приложения:  
+https://drive.google.com/file/d/1h7h3ZyuVeSJY7k_26GtHo0rs72FLZsTL/view?usp=sharing
 ---
 
 ## Разработчик
