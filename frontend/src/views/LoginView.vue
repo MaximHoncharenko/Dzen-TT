@@ -46,7 +46,13 @@ export default {
         const data = await response.json();
         localStorage.setItem('access', data.access);
         localStorage.setItem('refresh', data.refresh);
-        localStorage.setItem('username', this.username); // <-- вот эта строка
+
+        // Получаем username из API
+        const userRes = await fetch('http://localhost:8000/api/user/', {
+          headers: { 'Authorization': 'Bearer ' + data.access }
+        });
+        const userData = await userRes.json();
+        localStorage.setItem('username', userData.username);
 
         this.$router.push('/');
       } catch (err) {
