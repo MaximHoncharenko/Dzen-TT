@@ -94,118 +94,28 @@ def index(request):
     <html lang="uk">
     <head>
         <meta charset="UTF-8" />
-        <title>Коментарі</title>
+        <title>API документація</title>
         <style>
-            body {{{{ font-family: Arial, sans-serif; margin: 20px; }}}}
-            .comment {{{{ border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }}}}
-            .reply {{{{ margin-left: 30px; }}}}
-            .author {{{{ font-weight: bold; }}}}
-            textarea {{{{ width: 100%; height: 60px; }}}}
-            button {{{{ margin-top: 5px; }}}}
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            .btn {
+                display: inline-block;
+                padding: 16px 32px;
+                margin: 20px;
+                font-size: 18px;
+                background: #1b563f;
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                text-decoration: none;
+                transition: background 0.2s;
+            }
+            .btn:hover { background: #14512d; }
         </style>
     </head>
     <body>
-
-    <h1>Коментарі</h1>
-
-    <div id="comments-container"></div>
-
-    <h2>Додати новий коментар</h2>
-    <textarea id="new-comment-text" placeholder="Ваш коментар..."></textarea><br/>
-    <input type="text" id="captcha" placeholder="Введіть CAPTCHA: abcd" /><br/>
-    <button onclick="addComment()">Відправити</button>
-
-    <script>
-        async function fetchComments() {{{{
-            const res = await fetch('/api/comments/');
-            const data = await res.json();
-            const container = document.getElementById('comments-container');
-            container.innerHTML = '';
-            data.results.forEach comment => {{{{
-                container.appendChild(renderComment(comment));
-            }}}});
-        }}}}
-
-        function renderComment(comment, isReply = false) {{{{
-            const div = document.createElement('div');
-            div.className = 'comment' + (isReply ? ' reply' : '');
-            div.dataset.id = comment.id;
-
-            const author = document.createElement('div');
-            author.className = 'author';
-            author.textContent = comment.user.username || 'Анонім';
-            div.appendChild(author);
-
-            const text = document.createElement('div');
-            text.textContent = comment.text;
-            div.appendChild(text);
-
-            const replyBtn = document.createElement('button');
-            replyBtn.textContent = 'Відповісти';
-            replyBtn.onclick = () => {{{{
-                if (div.querySelector('textarea')) return;
-                const textarea = document.createElement('textarea');
-                textarea.placeholder = 'Ваша відповідь...';
-                const captcha = document.createElement('input');
-                captcha.placeholder = 'CAPTCHA: abcd';
-                const sendBtn = document.createElement('button');
-                sendBtn.textContent = 'Відправити відповідь';
-                sendBtn.onclick = () => addReply(comment.id, textarea.value, captcha.value);
-                div.appendChild(textarea);
-                div.appendChild(captcha);
-                div.appendChild(sendBtn);
-            }}}};
-            div.appendChild(replyBtn);
-
-            if (comment.replies && comment.replies.length > 0) {{{{
-                comment.replies.forEach(reply => {{{{
-                    div.appendChild(renderComment(reply, true));
-                }}}});
-            }}}}
-
-            return div;
-        }}}}
-
-        async function addComment() {{{{
-            const text = document.getElementById('new-comment-text').value.trim();
-            const captcha = document.getElementById('captcha').value.trim();
-            if (!text || !captcha) {{{{
-                alert('Заповніть усі поля');
-                return;
-            }}}}
-            await sendComment(text, null, captcha);
-            document.getElementById('new-comment-text').value = '';
-            document.getElementById('captcha').value = '';
-            fetchComments();
-        }}}}
-
-        async function addReply(parentId, text, captcha) {{{{
-            if (!text.trim() || !captcha.trim()) {{{{
-                alert('Заповніть всі поля');
-                return;
-            }}}}
-            await sendComment(text, parentId, captcha);
-            fetchComments();
-        }}}}
-
-        async function sendComment(text, parentId, captcha) {{{{
-            const res = await fetch('/api/comments/', {{{{
-                method: 'POST',
-                headers: {{{{
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('access')
-                }}}},
-                body: JSON.stringify({{{{text, parent_id: parentId, captcha}}}})
-            }}}});
-            if (!res.ok) {{{{
-                const err = await res.json();
-                alert('Помилка: ' + JSON.stringify(err));
-            }}}}
-        }}}}
-
-        fetchComments();
-    </script>
-
+        <h1>API документація</h1>
+        <a href="/swagger/" class="btn">Swagger UI</a>
+        <a href="/redoc/" class="btn">Redoc</a>
     </body>
     </html>
     """
