@@ -99,7 +99,7 @@ docker-compose exec web python manage.py createsuperuser
 
 В проекте используются три основные сущности:
 
-![Схема БД](./backend/comments.png)
+Схема БД
 
 - **Comment**
   - `id` — уникальный идентификатор комментария
@@ -135,8 +135,6 @@ docker-compose exec web python manage.py createsuperuser
 ## Видео-демонстрация
 
 Видео с демонстрацией работы приложения:  
-[Ссылка на видео](#) *(добавьте ссылку на ваш ролик)*
-
 ---
 
 ## Разработчик
@@ -147,30 +145,10 @@ docker-compose exec web python manage.py createsuperuser
 
 ---
 
-## Запуск без Docker (опционально)
-
-### Backend
-
-```sh
-cd backend
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
-```
-
-### Frontend
-
-```sh
-cd frontend
-npm install
-npm run dev
-```
-
----
 
 ## Примечания
 
 - Для production-режима настройте переменные окружения и секретные ключи.
-- Для деплоя на сервере используйте docker-compose или инструкции из README.
+- Для деплоя на сервере используйте docker-compose и инструкции из README.
 
 ---
