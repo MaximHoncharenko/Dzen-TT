@@ -241,5 +241,4 @@ __pycache__/
 !**/migrations/__init__.py   # якщо хочеш залишати порожні пакети міграцій
 
 # Тимчасові резервні файли редакторів
-*~
-Dzen TT/comments.pem
+comments.pem
