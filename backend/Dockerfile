@@ -12,6 +12,7 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 
 # Копіюємо проєкт
 COPY . .
+RUN python manage.py collectstatic --noinput
 
 # Копіюємо скрипт очікування БД
 COPY wait-for-db.sh /wait-for-db.sh

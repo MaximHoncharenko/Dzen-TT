@@ -28,25 +28,45 @@
 
 ---
 
-## Быстрый старт
+## Быстрый старт и деплой на AWS
 
-### 1. Клонируйте репозиторий
+### 1. Подготовка сервера (EC2)
+
+- Создайте EC2-инстанс (Ubuntu 22.04).
+- Откройте порты 80, 443, 8000, 5173 (если нужно).
+- Установите Docker и Docker Compose:
+  ```sh
+  sudo apt update
+  sudo apt install -y docker.io docker-compose
+  sudo usermod -aG docker $USER
+  ```
+
+### 2. Клонируйте репозиторий
 
 ```sh
 git clone <URL-ВАШЕГО-РЕПОЗИТОРИЯ>
 cd <папка-проекта>
 ```
 
-### 2. Запустите в Docker
+### 3. Настройте переменные окружения
+
+- Создайте файл `.env` (или отредактируйте `docker-compose.yml`), укажите параметры БД, секреты и т.д.
+
+### 4. Запустите проект в Docker
 
 ```sh
-docker-compose up --build
+docker-compose up -d --build
 ```
 
-- Бэкенд: http://56.228.36.74:8000
-- Фронтенд:http://56.228.36.74:5173
+### 5. Автоматизация миграций и сборка статики
 
-### 3. Создайте суперпользователя (опционально)
+Выполните миграции и соберите статику одной командой:
+
+```sh
+docker-compose exec web sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic --noinput"
+```
+
+### 6. (Опционально) Создайте суперпользователя
 
 ```sh
 docker-compose exec web python manage.py createsuperuser
@@ -55,6 +75,7 @@ docker-compose exec web python manage.py createsuperuser
 ---
 
 ## Структура проекта
+
 
 - `backend/` — Django-проект (API, Channels, PostgreSQL, Redis)
 - `frontend/` — Vue 3 SPA (Vite)
