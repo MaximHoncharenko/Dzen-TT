@@ -127,7 +127,7 @@
         }
 
         const params = new URLSearchParams(window.location.search);
-        const res = await fetch(`http://localhost:8000/api/comments/?${params}`, {
+        const res = await fetch(`http://56.228.36.74:8000/api/comments/?${params}`, {
             headers: {
                 Authorization: localStorage.getItem('access') ? 'Bearer ' + localStorage.getItem('access') : undefined,
             },
