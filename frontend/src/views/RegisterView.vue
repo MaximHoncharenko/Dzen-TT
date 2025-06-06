@@ -29,7 +29,7 @@ export default {
   methods: {
     async register() {
       try {
-        const res = await fetch('http://localhost:8000/api/register/', {
+        const res = await fetch('http://56.228.36.74:8000/api/register/', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
