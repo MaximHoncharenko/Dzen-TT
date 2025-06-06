@@ -126,9 +126,7 @@ docker-compose exec web python manage.py createsuperuser
 - Один пользователь может иметь несколько комментариев (`user`)
 
 > Вся структура и связи отражены на ER-диаграмме выше (`comments.png`).  
-> Схема полностью соответствует models.py и миграциям Django.
-
-- Для сравнения структуры с MySQL Workbench приложен файл [`db_schema.mwb`](./db_schema.mwb).
+> Схема полностью соответствует models.py и миграциям Django..
 
 ---
 
