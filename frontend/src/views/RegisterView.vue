@@ -9,6 +9,7 @@
       <label>Пароль:</label>
       <input v-model="password" type="password" required />
       <button type="submit">Зареєструватись</button>
+      <p v-if="passwordWarning" class="error">Пароль повинен містити не менше 8 символів.</p>
       <p v-if="error" class="error">{{ error }}</p>
       <p v-if="success" class="success">{{ success }}</p>
     </form>
@@ -23,11 +24,21 @@ export default {
       email: '',
       password: '',
       error: '',
-      success: ''
+      success: '',
+      passwordWarning: false
     };
   },
   methods: {
     async register() {
+      this.error = '';
+      this.success = '';
+      this.passwordWarning = false;
+
+      if (this.password.length < 8) {
+        this.passwordWarning = true;
+        return;
+      }
+
       try {
         const res = await fetch('http://56.228.36.74:8000/api/register/', {
           method: 'POST',
@@ -39,7 +50,12 @@ export default {
           })
         });
 
-        const data = await res.json();
+        let data;
+        try {
+          data = await res.json();
+        } catch {
+          throw new Error('Сервер повернув невалідну відповідь. Спробуйте пізніше.');
+        }
 
         if (!res.ok) {
           throw new Error(data.error || 'Помилка реєстрації');
