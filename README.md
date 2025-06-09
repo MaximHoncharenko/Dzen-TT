@@ -74,8 +74,39 @@ docker-compose exec web python manage.py createsuperuser
 
 ---
 
-## Структура проекта
+## Автоматический запуск фронтенда и бэкенда
 
+Файл `docker-compose.yml` настроен так, что **фронтенд и бэкенд запускаются одной командой**.  
+Для этого в корне проекта должны быть две папки:  
+- `backend/` — Django-проект  
+- `frontend/` — Vue 3 SPA
+
+В папке `frontend` должен быть файл `Dockerfile` такого вида:
+
+```dockerfile
+# filepath: frontend/Dockerfile
+FROM node:20
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+EXPOSE 5173
+
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+```
+
+**Запуск всего проекта:**
+```sh
+docker-compose up -d --build
+```
+
+---
+
+## Структура проекта
 
 - `backend/` — Django-проект (API, Channels, PostgreSQL, Redis)
 - `frontend/` — Vue 3 SPA (Vite)
@@ -120,8 +151,6 @@ docker-compose exec web python manage.py createsuperuser
 
 В проекте используются три основные сущности:
 
-Схема БД
-
 - **Comment**
   - `id` — уникальный идентификатор комментария
   - `parent` — внешний ключ на другой комментарий (для вложенных ответов)
@@ -147,7 +176,7 @@ docker-compose exec web python manage.py createsuperuser
 - Один пользователь может иметь несколько комментариев (`user`)
 
 > Вся структура и связи отражены на ER-диаграмме выше (`comments.png`).  
-> Схема полностью соответствует models.py и миграциям Django..
+> Схема полностью соответствует models.py и миграциям Django.
 
 ---
 
@@ -155,6 +184,7 @@ docker-compose exec web python manage.py createsuperuser
 
 Видео с демонстрацией работы приложения:  
 https://drive.google.com/file/d/1h7h3ZyuVeSJY7k_26GtHo0rs72FLZsTL/view?usp=sharing
+
 ---
 
 ## Разработчик
@@ -165,10 +195,14 @@ https://drive.google.com/file/d/1h7h3ZyuVeSJY7k_26GtHo0rs72FLZsTL/view?usp=shari
 
 ---
 
-
 ## Примечания
 
 - Для production-режима настройте переменные окружения и секретные ключи.
 - Для деплоя на сервере используйте docker-compose и инструкции из README.
 
 ---
+
+## Доступ к развернутому приложению
+
+- **Бэкенд:** [http://56.228.36.74:8000](http://56.228.36.74:8000)
+- **Фронтенд:** [http://56.228.36.74:5173](http://56.228.36.74:5173)
