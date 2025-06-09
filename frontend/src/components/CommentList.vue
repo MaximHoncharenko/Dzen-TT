@@ -98,6 +98,11 @@
     <CommentForm v-if="isAuthenticated" @comment-added="fetchComments" />
     <p v-else>Увійдіть, щоб залишити коментар</p>
 
+    <!-- Сообщение о длине пароля -->
+    <div v-if="passwordWarning" style="color: #ff5555; margin-top: 10px;">
+      Пароль повинен містити не менше 8 символів.
+    </div>
+
     <!-- Lightbox -->
     <div v-if="lightboxImg" class="lightbox" @click="lightboxImg=null">
       <img :src="lightboxImg" style="max-width:90vw;max-height:90vh;" />
@@ -124,6 +129,7 @@ export default {
       loading: false,
       replyToId: null, // ID коментаря, на який зараз відповідають
       lightboxImg: null,
+      passwordWarning: false, // <--- добавлено
     };
   },
   computed: {
@@ -260,6 +266,13 @@ export default {
       } catch (e) {
         alert('Ошибка сети');
       }
+    },
+    // Добавьте этот метод для показа предупреждения
+    showPasswordWarning() {
+      this.passwordWarning = true;
+      setTimeout(() => {
+        this.passwordWarning = false;
+      }, 4000);
     },
   },
   beforeUnmount() {
