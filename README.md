@@ -206,3 +206,5 @@ https://drive.google.com/file/d/1h7h3ZyuVeSJY7k_26GtHo0rs72FLZsTL/view?usp=shari
 
 - **Бэкенд:** [http://56.228.36.74:8000](http://56.228.36.74:8000)
 - **Фронтенд:** [http://56.228.36.74:5173](http://56.228.36.74:5173)
+
+ssh -i "D:\Projects\Dzen TT\comments.pem" ubuntu@56.228.36.74
