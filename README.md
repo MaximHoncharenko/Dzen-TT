@@ -202,9 +202,11 @@ https://drive.google.com/file/d/1h7h3ZyuVeSJY7k_26GtHo0rs72FLZsTL/view?usp=shari
 
 ---
 
-## Доступ к развернутому приложению
+Доступ к развернутому приложению
+Приложение: http://54.196.231.54
+API Endpoints:
 
-- **Бэкенд:** [http://56.228.36.74:8000](http://56.228.36.74:8000)
-- **Фронтенд:** [http://56.228.36.74:5173](http://56.228.36.74:5173)
-
-ssh -i "D:\Projects\Dzen TT\comments.pem" ubuntu@56.228.36.74
+API: http://54.196.231.54/api/comments/  
+Admin: http://54.196.231.54/admin/
+Health: http://54.196.231.54/health
+Swagger: http://54.196.231.54/swagger/
