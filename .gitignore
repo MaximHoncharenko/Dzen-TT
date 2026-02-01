@@ -244,3 +244,6 @@ __pycache__/
 comments.pem
 firstkey.pem
 .\Dzen TT\comments.pem
+# SSH Keys
+*.pem
+*.key
