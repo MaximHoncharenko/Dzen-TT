@@ -17,7 +17,8 @@ def validate_file_extension(value):
         raise ValidationError('Unsupported file extension.')
 
 
-class Comment(models.Model):
+class Comment(models.Model):  # Ensure this inherits from models.Model to include an auto-generated id field
+    id = models.AutoField(primary_key=True)  # Explicitly define the id field
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     username = models.CharField(max_length=32, blank=True)
     email = models.EmailField(blank=True)
@@ -34,7 +35,8 @@ class Comment(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'Comment by {self.user.username} on {self.created_at.strftime("%Y-%m-%d %H:%M:%S")}'
+        user_display = self.user.username if self.user else "Anonymous"
+        return f'Comment by {user_display} on {self.created_at.strftime("%Y-%m-%d %H:%M:%S")}'
 
 
 class Attachment(models.Model):
@@ -66,4 +68,4 @@ class Attachment(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'File for Comment {self.comment.id}'
+        return f'File for Comment {self.comment.id}'  # Accessing the auto-generated id field

@@ -18,9 +18,9 @@ class AttachmentSerializer(serializers.ModelSerializer):
 
 
 class RecursiveCommentSerializer(serializers.Serializer):
-    def to_representation(self, value):
-        serializer = CommentSerializer(value, context=self.context)
-        return serializer.data
+    def to_representation(self, instance) -> dict:
+        serializer = CommentSerializer(instance, context=self.context)
+        return dict(serializer.data)
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -64,19 +64,19 @@ class CommentSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(f'Тег <{tag}> не закритий або закритий некоректно')
         return value
 
-    def validate(self, data):
+    def validate(self, attrs):
         user = self.context['request'].user
         if not user.is_authenticated:
-            # Аноним: username и email обязательны
-            if not data.get('username') or not data.get('email'):
+            #  username и email обязательны
+            if not attrs.get('username') or not attrs.get('email'):
                 raise serializers.ValidationError("User Name и Email обовʼязкові для анонімних коментарів.")
-            if not re.match(r'^[A-Za-z0-9]+$', data['username']):
+            if not re.match(r'^[A-Za-z0-9]+$', attrs['username']):
                 raise serializers.ValidationError("User Name: тільки латиниця і цифри.")
-        return data
+        return attrs
 
     def create(self, validated_data):
         request = self.context.get('request')
-        file = request.FILES.get('file')
+        file = request.FILES.get('file') if request and hasattr(request, 'FILES') else None
         validated_data.pop('captcha', None)
         comment = Comment.objects.create(**validated_data)
         if file:
@@ -84,9 +84,10 @@ class CommentSerializer(serializers.ModelSerializer):
         # Отправить обновление в WebSocket
         from .serializers import CommentSerializer
         channel_layer = get_channel_layer()
-        data = CommentSerializer(comment, context={'request': request}).data
-        async_to_sync(channel_layer.group_send)(
-            "comments",
-            {"type": "comment_update", "data": data}
-        )
+        if channel_layer is not None:
+            data = CommentSerializer(comment, context={'request': request}).data
+            async_to_sync(channel_layer.group_send)(
+                "comments",
+                {"type": "comment_update", "data": data}
+            )
         return comment

@@ -54,7 +54,7 @@ class ReplyCreateAPIView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        parent_id = self.request.data.get('parent_id')
+        parent_id = self.request.POST.get('parent_id')
         if not parent_id:
             raise ValidationError({'parent_id': 'Обовʼязково вказати parent_id для відповіді.'})
         try:
