@@ -12,7 +12,7 @@ export default {
   props: {
     apiUrl: {
       type: String,
-      default: "http://56.228.36.74:8000/api/captcha/"
+      default: "http://54.196.231.54/api/captcha/"
     }
   },
   data() {

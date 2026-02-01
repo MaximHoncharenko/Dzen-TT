@@ -30,7 +30,7 @@ export default {
   methods: {
     async login() {
       try {
-        const response = await fetch('http://56.228.36.74:8000/api/token/', {
+        const response = await fetch('http://54.196.231.54/api/token/', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -48,7 +48,7 @@ export default {
         localStorage.setItem('refresh', data.refresh);
 
         // Получаем username из API
-        const userRes = await fetch('http://56.228.36.74:8000/api/user/', {
+        const userRes = await fetch('http://54.196.231.54/api/user/', {
           headers: { 'Authorization': 'Bearer ' + data.access }
         });
         const userData = await userRes.json();

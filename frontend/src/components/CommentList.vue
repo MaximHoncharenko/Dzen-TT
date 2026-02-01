@@ -33,14 +33,14 @@
                     <div v-for="att in reply.attachments" :key="att.id" style="display:inline-block; margin-right:5px;">
                       <img
                         v-if="isImage(att.file)"
-                        :src="att.file.startsWith('http') ? att.file : 'http://56.228.36.74:8000' + att.file"
-                        @click="openLightbox(att.file.startsWith('http') ? att.file : 'http://56.228.36.74:8000' + att.file)"
+                        :src="att.file.startsWith('http') ? att.file : 'http://54.196.231.54' + att.file"
+                        @click="openLightbox(att.file.startsWith('http') ? att.file : 'http://54.196.231.54' + att.file)"
                         style="max-width:40px;max-height:40px;cursor:pointer;border:1px solid #ccc;"
                         alt="attachment"
                       />
                       <a
                         v-else
-                        :href="att.file.startsWith('http') ? att.file : 'http://56.228.36.74:8000' + att.file"
+                        :href="att.file.startsWith('http') ? att.file : 'http://54.196.231.54' + att.file"
                         target="_blank"
                       >TXT</a>
                     </div>
@@ -53,14 +53,14 @@
                 <div v-for="att in comment.attachments" :key="att.id" style="display:inline-block; margin-right:5px;">
                   <img
                     v-if="isImage(att.file)"
-                    :src="att.file.startsWith('http') ? att.file : 'http://56.228.36.74:8000' + att.file"
-                    @click="openLightbox(att.file.startsWith('http') ? att.file : 'http://56.228.36.74:8000' + att.file)"
+                    :src="att.file.startsWith('http') ? att.file : 'http://54.196.231.54' + att.file"
+                    @click="openLightbox(att.file.startsWith('http') ? att.file : 'http://54.196.231.54' + att.file)"
                     style="max-width:60px;max-height:60px;cursor:pointer;border:1px solid #ccc;"
                     alt="attachment"
                   />
                   <a
                     v-else
-                    :href="att.file.startsWith('http') ? att.file : 'http://56.228.36.74:8000' + att.file"
+                    :href="att.file.startsWith('http') ? att.file : 'http://54.196.231.54' + att.file"
                     target="_blank"
                   >TXT</a>
                 </div>
@@ -151,7 +151,7 @@ export default {
         if (token) {
           headers.Authorization = 'Bearer ' + token;
         }
-        const res = await authFetch(`http://56.228.36.74:8000/api/comments/?${params}`, {
+        const res = await authFetch(`http://54.196.231.54/api/comments/?${params}`, {
           headers,
           credentials: 'include'
         });
@@ -224,7 +224,7 @@ export default {
       this.fetchComments();
     },
     connectWebSocket() {
-      const ws = new WebSocket('ws://56.228.36.74:8000/ws/comments/');
+      const ws = new WebSocket('ws://54.196.231.54:8000/ws/comments/');
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
         // Можно просто обновить список, либо добавить комментарий в начало
@@ -244,7 +244,7 @@ export default {
       if (!confirm('Удалить комментарий?')) return;
       const token = localStorage.getItem('access');
       try {
-        const res = await fetch(`http://56.228.36.74:8000/api/comments/${commentId}/`, {
+        const res = await fetch(`http://54.196.231.54/api/comments/${commentId}/`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`

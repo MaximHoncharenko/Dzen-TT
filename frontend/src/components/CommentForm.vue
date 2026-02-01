@@ -147,7 +147,7 @@ export default {
       if (this.file) formData.append('file', this.file);
 
       try {
-        const response = await fetch('http://56.228.36.74:8000/api/comments/', {
+        const response = await fetch('http://54.196.231.54/api/comments/', {
           method: 'POST',
           body: formData,
           credentials: 'include',

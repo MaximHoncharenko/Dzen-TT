@@ -12,7 +12,7 @@ export async function authFetch(url, options = {}) {
 
   // Якщо токен протерміновано — пробуємо оновити
   if (response.status === 401 && refresh) {
-    const refreshRes = await fetch('http://56.228.36.74:8000/api/token/refresh/', {
+    const refreshRes = await fetch('http://54.196.231.54/api/token/refresh/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refresh })
